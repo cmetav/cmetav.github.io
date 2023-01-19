@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Tesla</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script type="text/javascript">
+    window.addEventListener('DOMContentLoaded',function(){
+      (function(){
+        var isProductionEnv = false;
+        var uaStr = window.navigator.userAgent || window.navigator.vendor || window.opera || '';
+        var isWeChat = /micromessenger/i.test(uaStr);
+        var isAndroid = /Android/i.test(uaStr);
+        var isIOS = /iPad|iPhone|iPod/i.test(uaStr) && !window.MSStream;  
+        var scheme = 'https';
+        var path = '/_rs/service_schedule?screen=service_details_screen&channel=wechat'
+        //var path = '/_rs/referral?screen=referral_credits_screen'
+        var redirectUrl = '';
+        var downloadTimer;
+
+        if(isAndroid){
+          if(isWeChat){
+            showWechatPage();
+            return;
+          }
+          scheme = "tesla-eng";
+        }
+
+        if(isProductionEnv){
+          if (window.location.href.includes("www.tesla.cn")) {
+            redirectUrl = scheme + '://ownership.tesla.cn' + path;
+          } else {
+            redirectUrl = scheme + '://www.tesla.cn' + path;
+          }
+        }else {
+          var rx = Math.floor(Math.random() * 10)%3;
+          if(window.location.href.includes("mobile-links.eng.vn.cloud.tesla.cn") || rx ==2 ){
+            redirectUrl = scheme + '://mobile-links.eng.vn.cloud.tesla.com' + path;
+          }else {
+            redirectUrl = scheme + '://mobile-links.eng.vn.cloud.tesla.cn' + path;
+          }
+        }
+
+        document.addEventListener('visibilitychange webkitvisibilitychange',function(){
+          if(document.hidden || document.webkitHidden){
+            clearTimeout(downloadTimer);
+          }
+        });
+        const initLoadTime = new Date().valueOf();
+        if(isAndroid){
+          console.log("Android launch at "+ initLoadTime+":",redirectUrl);
+          window.location.href = redirectUrl;
+        }else if(isIOS) {
+          console.log("iOS launch:",redirectUrl);
+          window.location.href = redirectUrl;
+        }
+
+        function showWechatPage(){
+          document.querySelector('.wechat-page').classList.add('show')
+        }
+      })();
+    })
+  </script>
+  </head>
+  <body>
+    <div class="wechat-page">
+      <img src="./arrow.png" alt="path" />
+      <div>
+        <p>请点击右上角 ···</p>
+        <p>选择“在默认浏览器里打开”</p>
+      </div>
+    </div>
+  </body>
+</html>
