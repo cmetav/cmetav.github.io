@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Test Demo</title>
+    <style type="text/css">
+        .wechat-page {
+            display: none;
+            font-size: 14px;
+        }
+
+        .wechat-page img {
+            width: 77px;
+            position: absolute;
+            right: 35px;
+            top: 10px;
+        }
+        .wechat-page.show {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            background: #fff;
+            overflow: hidden;
+        }
+        .wechat-page div {
+            font-weight: 400;
+            line-height: 17px;
+            text-align: center;
+            margin-top: 195px;
+        }
+    </style>
+    <script type="text/javascript">
+        
+        window.addEventListener('DOMContentLoaded',function(){
+            (function(){
+                var isProductionEnv = true;
+                var uaStr = window.navigator.userAgent||window.navigator.vendor||window.opera||'';
+                var isWeChat = /micromessenger/i.test(uaStr);
+                var isAndroid = /Android/i.test(uaStr);
+                var isIOS = /iPad|iPhone|iPod/i.test(uaStr) && !window.MSStream;
+                var scheme = 'https'
+                var path = '/_rs/referral?screen=referral_credits_screen&channel=serviceScheduling';
+                var redirectUrl = '';
+                var teslaSupportUrl = 'https://www.tesla.cn/support/tesla-app';
+                var downloadTimer;
+
+                if(isAndroid){
+                    if(isWeChat){
+                        showWeChatPage();
+                        return;
+                    }
+                    scheme = isProductionEnv ? 'tesla' : 'tesla-eng';
+                }
+
+                if(isProductionEnv){
+                    if(window.location.href.includes('www.tesla.cn')){
+                        redirectUrl = scheme+'://ownership.tesla.cn'+path;
+                    }else {
+                        redirectUrl = scheme +'://www.tesla.cn'+path;
+                    }
+                }else {
+                    redirectUrl = scheme + '://mobile-links.eng.vn.cloud.tesla.com'+path;
+                }
+                const initLoadTime = new Date().valueOf();
+                document.addEventListener('visibilitychange webkitvisibilitychange',function(){
+                    if(document.hidden||document.webkitHidden){
+                        clearTimeout(downloadTimer);
+                    }
+                });
+
+                !isProductionEnv && console.log('Tesla Deep link at :'+initLoadTime,redirectUrl)
+                if(isAndroid){
+                    window.location.href = redirectUrl;
+                    setTimeout(function(){
+                        window.location.href = teslaSupportUrl
+                    },3000)
+                }else if(isIOS){
+                    window.location.href = redirectUrl;
+                    teslaSupportUrl = 'https://apps.apple.com/cn/app/tesla/id582007913';
+                    setTimeout(function(){
+                        window.location.href = teslaSupportUrl
+                    },3000)
+                }else{
+                    console.log('Desktop Unsupported.')
+                }
+
+                function showWeChatPage(){
+                    document.querySelector('.wechat-page').classList.add('show')
+                }
+            })();
+        });
+    </script>
+</head>
+<body>
+    <div class="wechat-page">
+        <img src="/arrow.png" alt="path"/>
+        <div>
+            <p>请点击右上角 ...</p>
+            <p>选择“在默认浏览器打开”</p>
+        </div>
+    </div>
+</body>
+</html>
